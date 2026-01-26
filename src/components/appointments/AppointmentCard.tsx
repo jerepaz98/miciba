@@ -1,8 +1,9 @@
-import React from 'react';
+ï»¿import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Appointment } from '../../types';
 import { colors } from '../../constants/colors';
 import { theme } from '../../constants/theme';
+import { strings } from '../../constants/strings';
 
 type Props = {
   appointment: Appointment;
@@ -13,10 +14,12 @@ export const AppointmentCard = ({ appointment }: Props) => (
     <View style={styles.header}>
       <Text style={styles.doctor}>{appointment.doctorName}</Text>
       <View style={[styles.badge, appointment.pendingSync === 1 ? styles.pending : styles.synced]}>
-        <Text style={styles.badgeText}>{appointment.pendingSync === 1 ? 'Pending' : 'Synced'}</Text>
+        <Text style={styles.badgeText}>
+          {appointment.pendingSync === 1 ? strings.appointments.pendingOffline : strings.appointments.synced}
+        </Text>
       </View>
     </View>
-    <Text style={styles.detail}>{appointment.date} · {appointment.time}</Text>
+    <Text style={styles.detail}>{appointment.date} - {appointment.time}</Text>
     {appointment.notes ? <Text style={styles.notes}>{appointment.notes}</Text> : null}
   </View>
 );

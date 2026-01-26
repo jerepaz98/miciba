@@ -37,7 +37,7 @@ const AppBootstrap = () => {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg }}>
         <ActivityIndicator color={colors.primary} />
-        <Text style={{ marginTop: 12, color: colors.textSoft }}>Loading Doctor's Point...</Text>
+        <Text style={{ marginTop: 12, color: colors.textSoft }}>Loading MiCIBA...</Text>
       </View>
     );
   }

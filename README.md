@@ -1,26 +1,46 @@
-# DOCTOR'S POINT
+﻿# MiCIBA
 
-App mobile para buscar especialistas, ver perfiles de doctores, reservar turnos y gestionar perfil con sincronizacion offline. Construida con Expo + React Native + TypeScript, Redux Toolkit, Firebase REST y SQLite.
+Aplicación móvil para encontrar especialistas, reservar turnos y gestionar el perfil del paciente con soporte sin conexión. El proyecto está desarrollado con Expo + React Native + TypeScript y contempla persistencia local con SQLite y sincronización con Firebase.
 
-## Requisitos
-- Node.js + npm
-- Expo CLI (`npm install -g expo-cli`)
+## Funcionalidades
+- Autenticación con correo y contraseña.
+- Listado y detalle de doctores.
+- Reserva y gestión de turnos.
+- Perfil con foto desde cámara/galería y ubicación.
+- Caché local con SQLite.
+- Sincronización sin conexión/con conexión de turnos y perfil.
 
-## Instalacion
+## Tecnologías
+- Expo
+- React Native
+- TypeScript
+- Redux Toolkit
+- Firebase REST API
+- Firebase Realtime Database (RTDB)
+- SQLite (expo-sqlite)
+- NetInfo
+- ImagePicker
+- Location
+
+## Instalación (Windows)
+1) Instalar dependencias:
 ```bash
 npm install
 ```
-
-## Ejecutar
+2) Iniciar el proyecto:
 ```bash
-npm run start
+npx expo start -c
 ```
 
-## Configuracion Firebase
-Editar `src/services/firebase/config.ts`:
-- `FIREBASE_API_KEY`: API key de Firebase
-- `AUTH_URL`: `https://identitytoolkit.googleapis.com/v1`
-- `DB_URL`: URL de Realtime Database, ejemplo `https://tu-proyecto.firebaseio.com`
+## Configuración Firebase
+En `src/services/firebase/config.ts`:
+- Reemplazar `apiKey` con `FIREBASE_API_KEY`.
+- Reemplazar `dbUrl` con `FIREBASE_DB_URL`.
+- Mantener `authUrl` con el valor de Identity Toolkit: `https://identitytoolkit.googleapis.com/v1`.
+
+Pasos en Firebase:
+1) Activar autenticación Email/Password (correo y contraseña).
+2) Crear una Realtime Database.
 
 Estructura RTDB recomendada:
 - `/doctors.json`
@@ -28,26 +48,15 @@ Estructura RTDB recomendada:
 - `/users/{localId}/appointments.json`
 - `/notifications/{localId}.json`
 
-## Expo Router
-- Entry point configurado como `expo-router/entry`.
-- `app/_layout.tsx` envuelve toda la app con Redux Provider y renderiza el arbol de React Navigation.
+## Persistencia local y sincronización sin conexión
+- MiCiba: se descargan desde Firebase cuando hay conexión y se cachean en SQLite. En modo sin conexión se leen desde `doctors_cache`.
+- Turnos: si no hay conexión, se guardan con `pendingSync = 1` y se sincronizan al recuperar internet.
+- Perfil: siempre se guarda localmente en SQLite y se sincroniza con Firebase cuando hay conexión.
 
-## Offline sync
-- Doctores: online se descargan desde Firebase y se cachean en SQLite, offline se leen desde `doctors_cache`.
-- Turnos: si no hay conexion se guardan con `pendingSync = 1` y se sincronizan al recuperar internet.
-- Perfil: siempre se guarda localmente en SQLite; solo se sube a Firebase si hay internet.
-
-## SQLite (tablas locales)
-- `sessions`: token, localId, email
-- `doctors_cache`: cache de doctores
-- `appointments`: turnos con `pendingSync`
-- `user_profile`: perfil local
-
-## Permisos requeridos
-Asegurate de otorgar permisos de:
-- Camara (foto de perfil)
-- Galeria
-- Ubicacion (reverse geocode)
+## Permisos (Android)
+- Cámara (foto de perfil).
+- Galería.
+- Ubicación (geolocalización y geocodificación inversa).
 
 ## Estructura del proyecto
 ```
@@ -55,38 +64,33 @@ app/
   _layout.tsx
 src/
   components/
-    ui/
-    doctors/
     appointments/
+    doctors/
     notifications/
+    ui/
+  constants/
+  database/
+  navigation/
   screens/
-    auth/
-    home/
-    doctors/
     appointments/
-    notification/
+    auth/
+    doctors/
+    home/
     menu/
+    notification/
+    placeholders/
     profile/
     settings/
-    placeholders/
-  navigation/
-  store/
-    slices/
   services/
     firebase/
-  database/
-  constants/
-  utils/
+  store/
+    slices/
   types/
+  utils/
 ```
 
-## Scripts
-- `npm run start`: iniciar Expo
-- `npm run android`: abrir en Android
-- `npm run ios`: abrir en iOS
-- `npm run web`: abrir en Web
+## Capturas
+Pegar aquí las capturas de pantalla del flujo principal de la app.
 
-## Notas
-- Usa fuente Nunito mediante `@expo-google-fonts/nunito`.
-- El Tab Bar usa iconos estilo emoji y muestra un dot activo.
-- Reemplazar los assets de `assets/` por imagenes reales.
+## Curso
+Coderhouse - Desarrollo de Aplicaciones

@@ -6,6 +6,7 @@ import { AppNavigator } from './navigation/AppNavigator';
 import { initDatabase, fetchSession } from './database/db';
 import { setAuth } from './store/slices/authSlice';
 import { colors } from './constants/colors';
+import { strings } from './constants/strings';
 
 export const RootApp = () => {
   const dispatch = useDispatch();
@@ -33,7 +34,9 @@ export const RootApp = () => {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg }}>
         <ActivityIndicator color={colors.primary} />
-        <Text style={{ marginTop: 12, color: colors.textSoft }}>Loading Doctor's Point...</Text>
+        <Text style={{ marginTop: 12, color: colors.textSoft }}>
+          {strings.common.loading} {strings.auth.welcomeTitle}...
+        </Text>
       </View>
     );
   }

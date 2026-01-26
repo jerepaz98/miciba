@@ -11,10 +11,14 @@ import { theme } from '../../constants/theme';
 import { login } from '../../services/firebase/authService';
 import { setAuth } from '../../store/slices/authSlice';
 import { insertSession } from '../../database/db';
+import { strings } from '../../constants/strings';
 
 const schema = yup.object({
-  email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup.string().min(6, 'Min 6 characters').required('Password is required')
+  email: yup.string().email(strings.auth.validations.invalidEmail).required(strings.auth.validations.emailRequired),
+  password: yup
+    .string()
+    .min(6, strings.auth.validations.minPassword)
+    .required(strings.auth.validations.passwordRequired)
 });
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignIn'>;
@@ -36,7 +40,7 @@ export const SignInScreen = ({ navigation }: Props) => {
       dispatch(setAuth(session));
       await insertSession(session);
     } catch (err: any) {
-      setError(err?.message || 'Login failed');
+      setError(err?.message || strings.errors.loginFailed);
     } finally {
       setLoading(false);
     }
@@ -44,13 +48,17 @@ export const SignInScreen = ({ navigation }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-      <AppInput label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
-      <AppInput label="Password" value={password} onChangeText={setPassword} secureTextEntry />
+      <Text style={styles.title}>{strings.auth.welcomeBack}</Text>
+      <AppInput label={strings.auth.email} value={email} onChangeText={setEmail} keyboardType="email-address" />
+      <AppInput label={strings.auth.password} value={password} onChangeText={setPassword} secureTextEntry />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <AppButton title={loading ? 'Signing In...' : 'Sign In'} onPress={onSubmit} disabled={loading} />
+      <AppButton
+        title={loading ? strings.auth.signingIn : strings.auth.signIn}
+        onPress={onSubmit}
+        disabled={loading}
+      />
       <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
-        New here? Create an account
+        {strings.auth.newHere}
       </Text>
     </View>
   );

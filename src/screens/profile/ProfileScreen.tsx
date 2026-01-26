@@ -13,6 +13,7 @@ import { setProfile } from '../../store/slices/userSlice';
 import { fetchUserProfileLocal, saveUserProfileLocal } from '../../database/db';
 import { saveUserProfileFirebase } from '../../services/firebase/dbService';
 import { UserProfile } from '../../types';
+import { strings } from '../../constants/strings';
 
 export const ProfileScreen = () => {
   const dispatch = useDispatch();
@@ -46,7 +47,11 @@ export const ProfileScreen = () => {
   }, [dispatch, storedProfile]);
 
   const pickFromGallery = async () => {
-    await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      setMessage(strings.permissions.gallery);
+      return;
+    }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -58,7 +63,11 @@ export const ProfileScreen = () => {
   };
 
   const takePhoto = async (cameraType: ImagePicker.CameraType) => {
-    await ImagePicker.requestCameraPermissionsAsync();
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      setMessage(strings.permissions.camera);
+      return;
+    }
     const result = await ImagePicker.launchCameraAsync({
       cameraType,
       allowsEditing: true,
@@ -72,7 +81,7 @@ export const ProfileScreen = () => {
   const handleLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
-      setMessage('Location permission denied');
+      setMessage(strings.permissions.locationDenied);
       return;
     }
     const position = await Location.getCurrentPositionAsync({});
@@ -99,38 +108,46 @@ export const ProfileScreen = () => {
 
     await saveUserProfileLocal(profile);
     dispatch(setProfile(profile));
-    setMessage('Profile saved locally');
+    setMessage(strings.profile.savedLocal);
 
     const netState = await NetInfo.fetch();
     if (netState.isConnected && auth.localId && auth.token) {
       try {
         await saveUserProfileFirebase(auth.localId, auth.token, profile);
-        setMessage('Profile synced to Firebase');
+        setMessage(strings.profile.syncedFirebase);
       } catch (error) {
-        setMessage('Saved locally. Firebase sync failed.');
+        setMessage(strings.profile.syncFailed);
       }
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.title}>{strings.profile.profile}</Text>
       <View style={styles.avatarWrapper}>
         {photoUri ? <Image source={{ uri: photoUri }} style={styles.avatar} /> : <View style={styles.placeholder} />}
       </View>
       <View style={styles.photoActions}>
-        <AppButton title="Gallery" onPress={pickFromGallery} style={styles.photoButton} />
-        <AppButton title="Front Cam" onPress={() => takePhoto(ImagePicker.CameraType.front)} style={styles.photoButton} />
-        <AppButton title="Back Cam" onPress={() => takePhoto(ImagePicker.CameraType.back)} style={styles.photoButton} />
+        <AppButton title={strings.profile.chooseFromGallery} onPress={pickFromGallery} style={styles.photoButton} />
+        <AppButton
+          title={strings.profile.frontCamera}
+          onPress={() => takePhoto(ImagePicker.CameraType.front)}
+          style={styles.photoButton}
+        />
+        <AppButton
+          title={strings.profile.backCamera}
+          onPress={() => takePhoto(ImagePicker.CameraType.back)}
+          style={styles.photoButton}
+        />
       </View>
-      <AppInput label="Full Name" value={fullName} onChangeText={setFullName} />
-      <AppInput label="Phone" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+      <AppInput label={strings.profile.fullName} value={fullName} onChangeText={setFullName} />
+      <AppInput label={strings.profile.phone} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
       <View style={styles.locationRow}>
-        <AppButton title="Get Location" onPress={handleLocation} style={styles.locationButton} />
-        <Text style={styles.locationText}>{address ?? 'No address yet'}</Text>
+        <AppButton title={strings.profile.getLocation} onPress={handleLocation} style={styles.locationButton} />
+        <Text style={styles.locationText}>{address ?? strings.profile.noAddress}</Text>
       </View>
       {message ? <Text style={styles.message}>{message}</Text> : null}
-      <AppButton title="Save Profile" onPress={onSave} />
+      <AppButton title={strings.profile.saveProfile} onPress={onSave} />
     </View>
   );
 };

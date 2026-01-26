@@ -13,6 +13,7 @@ import { addAppointment } from '../../store/slices/appointmentsSlice';
 import { insertAppointmentLocal } from '../../database/db';
 import { createAppointmentFirebase } from '../../services/firebase/dbService';
 import { Appointment } from '../../types';
+import { strings } from '../../constants/strings';
 
 const slots = ['09:00', '11:00', '13:00', '15:00'];
 
@@ -30,7 +31,7 @@ export const AppointmentFormScreen = ({ route, navigation }: Props) => {
 
   const onSubmit = async () => {
     if (!date || !time || !doctor || !auth.localId) {
-      setError('Complete the required fields.');
+      setError(strings.errors.completeFields);
       return;
     }
 
@@ -68,8 +69,15 @@ export const AppointmentFormScreen = ({ route, navigation }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Book with {doctor?.name ?? 'Doctor'}</Text>
-      <AppInput label="Date" placeholder="YYYY-MM-DD" value={date} onChangeText={setDate} />
+      <Text style={styles.title}>
+        {strings.doctors.bookWith} {doctor?.name ?? strings.doctors.doctor}
+      </Text>
+      <AppInput
+        label={strings.appointments.date}
+        placeholder={strings.appointments.datePlaceholder}
+        value={date}
+        onChangeText={setDate}
+      />
       <View style={styles.slotRow}>
         {slots.map((slot) => (
           <Text
@@ -81,9 +89,14 @@ export const AppointmentFormScreen = ({ route, navigation }: Props) => {
           </Text>
         ))}
       </View>
-      <AppInput label="Notes" placeholder="Write a note" value={notes} onChangeText={setNotes} />
+      <AppInput
+        label={strings.appointments.notes}
+        placeholder={strings.appointments.notesPlaceholder}
+        value={notes}
+        onChangeText={setNotes}
+      />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <AppButton title="Confirm Appointment" onPress={onSubmit} />
+      <AppButton title={strings.appointments.confirmAppointment} onPress={onSubmit} />
     </View>
   );
 };

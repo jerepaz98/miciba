@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Doctor } from '../../types';
 import { colors } from '../../constants/colors';
 import { theme } from '../../constants/theme';
+import { strings } from '../../constants/strings';
 
 type Props = {
   doctor: Doctor;
@@ -14,7 +15,10 @@ export const DoctorCardUI = ({ doctor, onPress }: Props) => (
     <Image source={{ uri: doctor.image }} style={styles.avatar} />
     <View style={styles.info}>
       <Text style={styles.name}>{doctor.name}</Text>
-      <Text style={styles.specialty}>{doctor.specialty}</Text>
+      <Text style={styles.specialty}>
+        {strings.doctors.specialtyLabels[doctor.specialty as keyof typeof strings.doctors.specialtyLabels] ??
+          doctor.specialty}
+      </Text>
       <Text style={styles.rating}>? {doctor.rating.toFixed(1)}</Text>
     </View>
   </TouchableOpacity>

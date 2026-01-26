@@ -16,6 +16,7 @@ import { cacheDoctors, fetchCachedDoctors } from '../../database/db';
 import { mockDoctors } from '../../utils/mockDoctors';
 import { MainTabsParamList } from '../../navigation/MainTabs';
 import { Doctor } from '../../types';
+import { strings } from '../../constants/strings';
 
 export const HomeScreen = () => {
   const dispatch = useDispatch();
@@ -71,10 +72,10 @@ export const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Find your Specialist</Text>
-      <AppInput value={search} onChangeText={setSearch} placeholder="Search doctor" icon="??" />
+      <Text style={styles.header}>{strings.home.findYourSpecialist}</Text>
+      <AppInput value={search} onChangeText={setSearch} placeholder={strings.home.searchPlaceholder} icon="??" />
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Categories</Text>
+        <Text style={styles.sectionTitle}>{strings.home.categories}</Text>
       </View>
       <FlatList
         data={categories}
@@ -82,12 +83,16 @@ export const HomeScreen = () => {
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
-          <CategoryCard label={item} active={item === selectedCategory} onPress={() => setSelectedCategory(item)} />
+          <CategoryCard
+            label={strings.home.categoryLabels[item as keyof typeof strings.home.categoryLabels] ?? item}
+            active={item === selectedCategory}
+            onPress={() => setSelectedCategory(item)}
+          />
         )}
         contentContainerStyle={styles.categories}
       />
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Available Doctors</Text>
+        <Text style={styles.sectionTitle}>{strings.home.availableDoctors}</Text>
       </View>
       <FlatList
         data={filtered}

@@ -14,6 +14,7 @@ import {
 import { setAppointments, markAsSynced } from '../../store/slices/appointmentsSlice';
 import { createAppointmentFirebase } from '../../services/firebase/dbService';
 import { Appointment } from '../../types';
+import { strings } from '../../constants/strings';
 
 export const MyAppointmentsScreen = () => {
   const dispatch = useDispatch();
@@ -67,8 +68,8 @@ export const MyAppointmentsScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>My Appointments</Text>
-        {syncing ? <Text style={styles.syncing}>Syncing...</Text> : null}
+        <Text style={styles.title}>{strings.appointments.myAppointments}</Text>
+        {syncing ? <Text style={styles.syncing}>{strings.appointments.syncing}</Text> : null}
       </View>
       <FlatList
         data={appointments}
@@ -76,7 +77,7 @@ export const MyAppointmentsScreen = () => {
         renderItem={({ item }) => <AppointmentCard appointment={item as Appointment} />}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<Text style={styles.empty}>No appointments yet.</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>{strings.appointments.empty}</Text>}
       />
     </View>
   );

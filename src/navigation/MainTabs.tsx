@@ -6,6 +6,7 @@ import { DoctorsStack } from './DoctorsStack';
 import { NotificationScreen } from '../screens/notification/NotificationScreen';
 import { MenuStack } from './MenuStack';
 import { colors } from '../constants/colors';
+import { strings } from '../constants/strings';
 
 export type MainTabsParamList = {
   HomeTab: undefined;
@@ -27,7 +28,7 @@ export const MainTabs = () => (
   <Tab.Navigator
     screenOptions={{
       headerShown: false,
-      tabBarShowLabel: false,
+      tabBarShowLabel: true,
       tabBarStyle: styles.tabBar
     }}
   >
@@ -35,6 +36,8 @@ export const MainTabs = () => (
       name="HomeTab"
       component={HomeScreen}
       options={{
+        tabBarLabel: strings.home.tabLabel,
+        title: strings.home.tabLabel,
         tabBarIcon: ({ focused }) => <TabIcon emoji="??" focused={focused} />
       }}
     />
@@ -42,6 +45,8 @@ export const MainTabs = () => (
       name="DoctorsTab"
       component={DoctorsStack}
       options={{
+        tabBarLabel: strings.doctors.doctors,
+        title: strings.doctors.doctors,
         tabBarIcon: ({ focused }) => <TabIcon emoji="??" focused={focused} />
       }}
     />
@@ -49,6 +54,8 @@ export const MainTabs = () => (
       name="NotificationTab"
       component={NotificationScreen}
       options={{
+        tabBarLabel: strings.notifications.notifications,
+        title: strings.notifications.notifications,
         tabBarIcon: ({ focused }) => <TabIcon emoji="??" focused={focused} />
       }}
     />
@@ -56,6 +63,8 @@ export const MainTabs = () => (
       name="MenuTab"
       component={MenuStack}
       options={{
+        tabBarLabel: strings.menu.menu,
+        title: strings.menu.menu,
         tabBarIcon: ({ focused }) => <TabIcon emoji="?" focused={focused} />
       }}
     />

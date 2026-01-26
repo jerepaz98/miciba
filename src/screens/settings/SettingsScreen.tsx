@@ -2,11 +2,12 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors } from '../../constants/colors';
 import { theme } from '../../constants/theme';
+import { strings } from '../../constants/strings';
 
 export const SettingsScreen = () => (
   <View style={styles.container}>
-    <Text style={styles.title}>Settings</Text>
-    <Text style={styles.subtitle}>Notifications, privacy, and app preferences.</Text>
+    <Text style={styles.title}>{strings.menu.settings}</Text>
+    <Text style={styles.subtitle}>{strings.menu.settingsSubtitle}</Text>
   </View>
 );
 

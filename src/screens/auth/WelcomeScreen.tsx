@@ -5,17 +5,18 @@ import { AuthStackParamList } from '../../navigation/AuthStack';
 import { AppButton } from '../../components/ui/AppButton';
 import { colors } from '../../constants/colors';
 import { theme } from '../../constants/theme';
+import { strings } from '../../constants/strings';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
 
 export const WelcomeScreen = ({ navigation }: Props) => (
   <View style={styles.container}>
-    <Text style={styles.title}>Doctor's Point</Text>
-    <Text style={styles.subtitle}>Find your specialist and book appointments easily.</Text>
+    <Text style={styles.title}>{strings.auth.welcomeTitle}</Text>
+    <Text style={styles.subtitle}>{strings.auth.welcomeSubtitle}</Text>
     <View style={styles.actions}>
-      <AppButton title="Sign In" onPress={() => navigation.navigate('SignIn')} style={styles.buttonSpacing} />
+      <AppButton title={strings.auth.signIn} onPress={() => navigation.navigate('SignIn')} style={styles.buttonSpacing} />
       <AppButton
-        title="Create Account"
+        title={strings.auth.createAccount}
         onPress={() => navigation.navigate('SignUp')}
         style={styles.secondaryButton}
       />

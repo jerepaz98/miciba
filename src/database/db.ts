@@ -1,10 +1,10 @@
-import * as SQLite from 'expo-sqlite';
+import { openDatabase, type SQLResultSet, type SQLiteDatabase } from 'expo-sqlite';
 import { Appointment, Session, UserProfile, Doctor } from '../types';
 
-const db = SQLite.openDatabase('doctorspoint.db');
+export const db: SQLiteDatabase = openDatabase('miciba.db');
 
 const executeSqlAsync = (sql: string, params: any[] = []) =>
-  new Promise<SQLite.SQLResultSet>((resolve, reject) => {
+  new Promise<SQLResultSet>((resolve, reject) => {
     db.transaction(
       (tx) => {
         tx.executeSql(

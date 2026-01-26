@@ -9,6 +9,7 @@ import { theme } from '../../constants/theme';
 import { logout } from '../../store/slices/authSlice';
 import { clearProfile } from '../../store/slices/userSlice';
 import { deleteSession } from '../../database/db';
+import { strings } from '../../constants/strings';
 
 type Props = NativeStackScreenProps<MenuStackParamList, 'MenuHome'>;
 
@@ -23,12 +24,16 @@ export const MenuScreen = ({ navigation }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Menu</Text>
+      <Text style={styles.title}>{strings.menu.menu}</Text>
       <View style={styles.actions}>
-        <AppButton title="Profile" onPress={() => navigation.navigate('Profile')} style={styles.buttonSpacing} />
-        <AppButton title="My Appointments" onPress={() => navigation.navigate('MyAppointments')} style={styles.buttonSpacing} />
-        <AppButton title="Settings" onPress={() => navigation.navigate('Settings')} style={styles.buttonSpacing} />
-        <AppButton title="Logout" onPress={handleLogout} style={styles.logout} />
+        <AppButton title={strings.menu.profile} onPress={() => navigation.navigate('Profile')} style={styles.buttonSpacing} />
+        <AppButton
+          title={strings.menu.myAppointments}
+          onPress={() => navigation.navigate('MyAppointments')}
+          style={styles.buttonSpacing}
+        />
+        <AppButton title={strings.menu.settings} onPress={() => navigation.navigate('Settings')} style={styles.buttonSpacing} />
+        <AppButton title={strings.menu.logout} onPress={handleLogout} style={styles.logout} />
       </View>
     </View>
   );

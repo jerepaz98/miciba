@@ -8,8 +8,9 @@ import { AppButton } from '../../components/ui/AppButton';
 import { colors } from '../../constants/colors';
 import { theme } from '../../constants/theme';
 import { mockDoctors } from '../../utils/mockDoctors';
+import { strings } from '../../constants/strings';
 
-const actionButtons = ['Voice Call', 'Video Call', 'Message'];
+const actionButtons = [strings.doctors.call, strings.doctors.videoCall, strings.doctors.message];
 
 type Props = NativeStackScreenProps<DoctorsStackParamList, 'DoctorDetail'>;
 
@@ -23,7 +24,7 @@ export const DoctorDetailScreen = ({ route, navigation }: Props) => {
   if (!doctor) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Doctor not found</Text>
+        <Text style={styles.title}>{strings.doctors.notFound}</Text>
       </View>
     );
   }
@@ -33,8 +34,13 @@ export const DoctorDetailScreen = ({ route, navigation }: Props) => {
       <View style={styles.card}>
         <Image source={{ uri: doctor.image }} style={styles.avatar} />
         <Text style={styles.name}>{doctor.name}</Text>
-        <Text style={styles.specialty}>{doctor.specialty}</Text>
-        <Text style={styles.bio}>{doctor.bio}</Text>
+        <Text style={styles.specialty}>
+          {strings.doctors.specialtyLabels[doctor.specialty as keyof typeof strings.doctors.specialtyLabels] ??
+            doctor.specialty}
+        </Text>
+        <Text style={styles.bio}>
+          {strings.doctors.bioByDoctorId[doctor.id as keyof typeof strings.doctors.bioByDoctorId] ?? doctor.bio}
+        </Text>
       </View>
       <View style={styles.actions}>
         {actionButtons.map((label) => (
@@ -43,7 +49,10 @@ export const DoctorDetailScreen = ({ route, navigation }: Props) => {
           </TouchableOpacity>
         ))}
       </View>
-      <AppButton title="Book Appointment" onPress={() => navigation.navigate('AppointmentForm', { doctorId: doctor.id })} />
+      <AppButton
+        title={strings.doctors.bookAppointment}
+        onPress={() => navigation.navigate('AppointmentForm', { doctorId: doctor.id })}
+      />
     </View>
   );
 };

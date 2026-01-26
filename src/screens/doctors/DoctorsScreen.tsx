@@ -14,6 +14,7 @@ import { fetchDoctorsFromFirebase } from '../../services/firebase/dbService';
 import { cacheDoctors, fetchCachedDoctors } from '../../database/db';
 import { mockDoctors } from '../../utils/mockDoctors';
 import { Doctor } from '../../types';
+import { strings } from '../../constants/strings';
 
 type Props = NativeStackScreenProps<DoctorsStackParamList, 'DoctorsList'>;
 
@@ -57,7 +58,7 @@ export const DoctorsScreen = ({ navigation }: Props) => {
 
   return (
     <View style={styles.container}>
-      <AppInput value={search} onChangeText={setSearch} placeholder="Search doctor" />
+      <AppInput value={search} onChangeText={setSearch} placeholder={strings.doctors.searchDoctor} />
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}

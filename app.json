@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "DOCTOR'S POINT",
-    "slug": "doctors-point",
+    "name": "MiCIBA",
+    "slug": "miciba",
+    "scheme": "miciba",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
