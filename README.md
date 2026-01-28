@@ -1,6 +1,8 @@
 ﻿# MiCIBA
-
-Aplicación móvil para encontrar especialistas, reservar turnos y gestionar el perfil del paciente con soporte sin conexión. El proyecto está desarrollado con Expo + React Native + TypeScript y contempla persistencia local con SQLite y sincronización con Firebase.
+- Aplicación móvil creada para facilitar y acercar el paciente al Doctor.
+- MiCIBA funciona para reservar turnos, la app brinda la posivilidad de escoger al doctor de la especialidad que estas buscando.
+- A la hora de crear tu usuario/perfil el paciente ppuede dirijirce hacia el menu y ahi modificar dicho perfil (Dando nombre, cambiando su foto y aportando su direccion). 
+- El proyecto está desarrollado con Expo + React Native + TypeScript y contempla persistencia local con SQLite y sincronización con Firebase.
 
 ## Funcionalidades
 - Autenticación con correo y contraseña.
@@ -18,9 +20,6 @@ Aplicación móvil para encontrar especialistas, reservar turnos y gestionar el 
 - Firebase REST API
 - Firebase Realtime Database (RTDB)
 - SQLite (expo-sqlite)
-- NetInfo
-- ImagePicker
-- Location
 
 ## Instalación (Windows)
 1) Instalar dependencias:
@@ -42,11 +41,6 @@ Pasos en Firebase:
 1) Activar autenticación Email/Password (correo y contraseña).
 2) Crear una Realtime Database.
 
-Estructura RTDB recomendada:
-- `/doctors.json`
-- `/users/{localId}/profile.json`
-- `/users/{localId}/appointments.json`
-- `/notifications/{localId}.json`
 
 ## Persistencia local y sincronización sin conexión
 - MiCiba: se descargan desde Firebase cuando hay conexión y se cachean en SQLite. En modo sin conexión se leen desde `doctors_cache`.
@@ -56,7 +50,7 @@ Estructura RTDB recomendada:
 ## Permisos (Android)
 - Cámara (foto de perfil).
 - Galería.
-- Ubicación (geolocalización y geocodificación inversa).
+- Ubicación.
 
 ## Estructura del proyecto
 ```
@@ -88,9 +82,3 @@ src/
   types/
   utils/
 ```
-
-## Capturas
-Pegar aquí las capturas de pantalla del flujo principal de la app.
-
-## Curso
-Coderhouse - Desarrollo de Aplicaciones
