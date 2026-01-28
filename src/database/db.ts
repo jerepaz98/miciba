@@ -1,25 +1,49 @@
-import { openDatabase, type SQLResultSet, type SQLiteDatabase } from 'expo-sqlite';
+import * as SQLite from 'expo-sqlite';
 import { Appointment, Session, UserProfile, Doctor } from '../types';
 
-export const db: SQLiteDatabase = openDatabase('miciba.db');
+let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
-const executeSqlAsync = (sql: string, params: any[] = []) =>
-  new Promise<SQLResultSet>((resolve, reject) => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          sql,
-          params,
-          (_, result) => resolve(result),
-          (_, error) => {
-            reject(error);
-            return false;
-          }
-        );
-      },
-      (error) => reject(error)
-    );
-  });
+const getDb = () => {
+  if (!dbPromise) {
+    dbPromise = SQLite.openDatabaseAsync('miciba.db');
+  }
+  return dbPromise;
+};
+
+type LegacyRows = {
+  length: number;
+  item: (index: number) => any;
+};
+
+type LegacyResult = {
+  rows: LegacyRows;
+  rowsAffected?: number;
+  insertId?: number;
+};
+
+const executeSqlAsync = async (sql: string, params: any[] = []): Promise<LegacyResult> => {
+  const db = await getDb();
+  const isSelect = /^\s*SELECT\b/i.test(sql);
+  if (isSelect) {
+    const rows = await db.getAllAsync(sql, params);
+    return {
+      rows: {
+        length: rows.length,
+        item: (index: number) => rows[index]
+      }
+    };
+  }
+
+  const result = await db.runAsync(sql, params);
+  return {
+    rows: {
+      length: 0,
+      item: () => undefined
+    },
+    rowsAffected: result.changes,
+    insertId: result.lastInsertRowId
+  };
+};
 
 const mapAppointment = (row: any): Appointment => ({
   ...row,
