@@ -40,6 +40,8 @@ export const strings = {
     categories: 'Categorías',
     availableDoctors: 'Doctores disponibles',
     seeAll: 'Ver todo',
+    bannerTitle: 'Buscas un especialista?',
+    bannerSubtitle: 'Reserva turnos en minutos',
     quickAccessAppointments: 'Acceso rápido a Mis turnos',
     emergency: 'Emergencia',
     tabLabel: 'Inicio',

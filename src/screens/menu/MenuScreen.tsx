@@ -1,20 +1,23 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch } from 'react-redux';
 import { MenuStackParamList } from '../../navigation/MenuStack';
-import { AppButton } from '../../components/ui/AppButton';
 import { colors } from '../../constants/colors';
 import { theme } from '../../constants/theme';
 import { logout } from '../../store/slices/authSlice';
 import { clearProfile } from '../../store/slices/userSlice';
 import { deleteSession } from '../../database/db';
-import { strings } from '../../constants/strings';
 
 type Props = NativeStackScreenProps<MenuStackParamList, 'MenuHome'>;
 
 export const MenuScreen = ({ navigation }: Props) => {
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const panelWidth = Math.min(width * 0.92, 380);
 
   const handleLogout = async () => {
     await deleteSession();
@@ -22,42 +25,125 @@ export const MenuScreen = ({ navigation }: Props) => {
     dispatch(clearProfile());
   };
 
+  const items = [
+    {
+      id: 'appointments',
+      label: 'Mis turnos',
+      icon: 'calendar-outline',
+      onPress: () => {
+        console.log('Mis turnos');
+        navigation.navigate('MyAppointments');
+      }
+    },
+    {
+      id: 'profile',
+      label: 'Perfil',
+      icon: 'person-outline',
+      onPress: () => {
+        console.log('Perfil');
+        navigation.navigate('Profile');
+      }
+    },
+    {
+      id: 'settings',
+      label: 'Ajustes',
+      icon: 'settings-outline',
+      onPress: () => {
+        console.log('Ajustes');
+        navigation.navigate('Settings');
+      }
+    },
+    {
+      id: 'logout',
+      label: 'Cerrar sesión',
+      icon: 'log-out-outline',
+      onPress: () => {
+        console.log('Cerrar sesión');
+        handleLogout();
+      }
+    }
+  ];
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{strings.menu.menu}</Text>
-      <View style={styles.actions}>
-        <AppButton title={strings.menu.profile} onPress={() => navigation.navigate('Profile')} style={styles.buttonSpacing} />
-        <AppButton
-          title={strings.menu.myAppointments}
-          onPress={() => navigation.navigate('MyAppointments')}
-          style={styles.buttonSpacing}
-        />
-        <AppButton title={strings.menu.settings} onPress={() => navigation.navigate('Settings')} style={styles.buttonSpacing} />
-        <AppButton title={strings.menu.logout} onPress={handleLogout} style={styles.logout} />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.overlay} />
+      <View
+        style={[
+          styles.panel,
+          {
+            width: panelWidth,
+            bottom: 90 + insets.bottom
+          }
+        ]}
+      >
+        {items.map((item, index) => (
+          <View key={item.id}>
+            <TouchableOpacity style={styles.row} activeOpacity={0.75} onPress={item.onPress}>
+              <View style={styles.iconCircle}>
+                <Ionicons name={item.icon as any} size={18} color={styles.iconColor.color} />
+              </View>
+              <Text style={styles.label}>{item.label}</Text>
+              <Ionicons name="chevron-forward" size={18} color={styles.chevronColor.color} />
+            </TouchableOpacity>
+            {index < items.length - 1 ? <View style={styles.separator} /> : null}
+          </View>
+        ))}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    padding: theme.spacing.lg,
     backgroundColor: colors.bg
   },
-  title: {
-    fontSize: 24,
-    fontFamily: 'Nunito_700Bold',
-    color: colors.textDark,
-    marginBottom: theme.spacing.lg
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.25)'
   },
-  actions: {
-    marginBottom: theme.spacing.md
+  panel: {
+    position: 'absolute',
+    alignSelf: 'center',
+    backgroundColor: '#3D6BD9',
+    borderRadius: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    shadowColor: '#0B1E2D',
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6
   },
-  buttonSpacing: {
-    marginBottom: theme.spacing.md
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14
   },
-  logout: {
-    backgroundColor: colors.danger
+  iconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12
+  },
+  iconColor: {
+    color: '#3D6BD9'
+  },
+  label: {
+    flex: 1,
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontFamily: 'Nunito_600SemiBold'
+  },
+  chevronColor: {
+    color: '#FFFFFF'
+  },
+  separator: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    marginLeft: 46
   }
 });

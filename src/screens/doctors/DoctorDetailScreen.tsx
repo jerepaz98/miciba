@@ -7,7 +7,7 @@ import { RootState } from '../../store/store';
 import { AppButton } from '../../components/ui/AppButton';
 import { colors } from '../../constants/colors';
 import { theme } from '../../constants/theme';
-import { mockDoctors } from '../../utils/mockDoctors';
+import { mockDoctors } from '../../data/mockDoctors';
 import { strings } from '../../constants/strings';
 
 const actionButtons = [strings.doctors.call, strings.doctors.videoCall, strings.doctors.message];
@@ -32,15 +32,16 @@ export const DoctorDetailScreen = ({ route, navigation }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Image source={{ uri: doctor.image }} style={styles.avatar} />
+        {doctor.image ? (
+          <Image source={{ uri: doctor.image }} style={styles.avatar} />
+        ) : (
+          <View style={styles.avatarPlaceholder}>
+            <Text style={styles.avatarText}>{doctor.name.slice(0, 2).toUpperCase()}</Text>
+          </View>
+        )}
         <Text style={styles.name}>{doctor.name}</Text>
-        <Text style={styles.specialty}>
-          {strings.doctors.specialtyLabels[doctor.specialty as keyof typeof strings.doctors.specialtyLabels] ??
-            doctor.specialty}
-        </Text>
-        <Text style={styles.bio}>
-          {strings.doctors.bioByDoctorId[doctor.id as keyof typeof strings.doctors.bioByDoctorId] ?? doctor.bio}
-        </Text>
+        <Text style={styles.specialty}>{doctor.specialty}</Text>
+        <Text style={styles.bio}>{doctor.bio}</Text>
       </View>
       <View style={styles.actions}>
         {actionButtons.map((label) => (
@@ -76,6 +77,20 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     marginBottom: theme.spacing.md
+  },
+  avatarPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: theme.spacing.md,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  avatarText: {
+    fontSize: 22,
+    fontFamily: 'Nunito_700Bold',
+    color: colors.primary
   },
   name: {
     fontSize: 20,

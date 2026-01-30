@@ -12,7 +12,7 @@ import { RootState } from '../../store/store';
 import { setDoctors } from '../../store/slices/doctorsSlice';
 import { fetchDoctorsFromFirebase } from '../../services/firebase/dbService';
 import { cacheDoctors, fetchCachedDoctors } from '../../database/db';
-import { mockDoctors } from '../../utils/mockDoctors';
+import { mockDoctors } from '../../data/mockDoctors';
 import { Doctor } from '../../types';
 import { strings } from '../../constants/strings';
 

@@ -1,84 +1,73 @@
-﻿# MiCIBA
-- Aplicación móvil creada para facilitar y acercar el paciente al Doctor.
-- MiCIBA funciona para reservar turnos, la app brinda la posivilidad de escoger al doctor de la especialidad que estas buscando.
-- A la hora de crear tu usuario/perfil el paciente ppuede dirijirce hacia el menu y ahi modificar dicho perfil (Dando nombre, cambiando su foto y aportando su direccion). 
-- El proyecto está desarrollado con Expo + React Native + TypeScript y contempla persistencia local con SQLite y sincronización con Firebase.
+# MiCIBA
 
-## Funcionalidades
-- Autenticación con correo y contraseña.
-- Listado y detalle de doctores.
-- Reserva y gestión de turnos.
-- Perfil con foto desde cámara/galería y ubicación.
-- Caché local con SQLite.
-- Sincronización sin conexión/con conexión de turnos y perfil.
+Aplicación móvil desarrollada con Expo + React Native + TypeScript para facilitar la búsqueda de profesionales de salud y la gestión de turnos desde el teléfono. El proyecto combina navegación por tabs y stacks, persistencia local con SQLite y sincronización con Firebase cuando hay conexión.
 
-## Tecnologías
-- Expo
-- React Native
-- TypeScript
-- Redux Toolkit
-- Firebase REST API
-- Firebase Realtime Database (RTDB)
-- SQLite (expo-sqlite)
+El flujo principal contempla autenticación, listado y detalle de doctores, reserva de turnos y un perfil de usuario con foto y ubicación. En modo sin conexión se usa caché local y se reintenta la sincronización al recuperar internet.
 
-## Instalación (Windows)
+## Características principales
+- Autenticación con email y contraseña.
+- Home con acceso a secciones principales.
+- Listado, búsqueda y detalle de doctores con datos remotos y fallback local.
+- Reserva de turnos y visualización en "Mis turnos".
+- Perfil con foto (cámara/galería) y ubicación.
+- Sincronización online/offline de perfil y turnos.
+
+## Instalación y ejecución
 1) Instalar dependencias:
 ```bash
 npm install
 ```
+
 2) Iniciar el proyecto:
 ```bash
 npx expo start -c
 ```
 
-## Configuración Firebase
-En `src/services/firebase/config.ts`:
-- Reemplazar `apiKey` con `FIREBASE_API_KEY`.
-- Reemplazar `dbUrl` con `FIREBASE_DB_URL`.
-- Mantener `authUrl` con el valor de Identity Toolkit: `https://identitytoolkit.googleapis.com/v1`.
-
-Pasos en Firebase:
-1) Activar autenticación Email/Password (correo y contraseña).
-2) Crear una Realtime Database.
-
-
-## Persistencia local y sincronización sin conexión
-- MiCiba: se descargan desde Firebase cuando hay conexión y se cachean en SQLite. En modo sin conexión se leen desde `doctors_cache`.
-- Turnos: si no hay conexión, se guardan con `pendingSync = 1` y se sincronizan al recuperar internet.
-- Perfil: siempre se guarda localmente en SQLite y se sincroniza con Firebase cuando hay conexión.
-
-## Permisos (Android)
-- Cámara (foto de perfil).
-- Galería.
-- Ubicación.
+3) Ejecutar en plataforma específica:
+```bash
+npm run android
+npm run ios
+npm run web
+```
 
 ## Estructura del proyecto
 ```
-app/
-  _layout.tsx
-src/
-  components/
-    appointments/
-    doctors/
-    notifications/
-    ui/
-  constants/
-  database/
-  navigation/
-  screens/
-    appointments/
-    auth/
-    doctors/
-    home/
-    menu/
-    notification/
-    placeholders/
-    profile/
-    settings/
-  services/
-    firebase/
-  store/
-    slices/
-  types/
-  utils/
+.
+├── app/
+│   ├── _layout.tsx
+│   └── index.tsx
+├── assets/
+│   ├── icon.png
+│   ├── logo.png
+│   ├── splash.png
+│   └── onboarding/
+├── src/
+│   ├── components/
+│   │   ├── appointments/
+│   │   ├── doctors/
+│   │   ├── notifications/
+│   │   └── ui/
+│   ├── constants/
+│   ├── database/
+│   ├── navigation/
+│   ├── screens/
+│   │   ├── appointments/
+│   │   ├── auth/
+│   │   ├── doctors/
+│   │   ├── home/
+│   │   ├── menu/   
+│   │   ├── notification/
+│   │   ├── placeholders/
+│   │   ├── profile/
+│   │   └── settings/
+│   ├── services/
+│   │   └── firebase/
+│   ├── store/
+│   │   └── slices/
+│   ├── types/
+│   └── utils/
+├── App.tsx
+├── app.json
+├── package.json
+└── tsconfig.json
 ```

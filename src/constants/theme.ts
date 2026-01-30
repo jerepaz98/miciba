@@ -22,6 +22,13 @@ export const theme = {
       shadowRadius: 10,
       shadowOffset: { width: 0, height: 6 },
       elevation: 3
+    },
+    medium: {
+      shadowColor: '#0B1E2D',
+      shadowOpacity: 0.12,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 6
     }
   }
 };

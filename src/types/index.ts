@@ -3,6 +3,8 @@ export type Doctor = {
   name: string;
   specialty: string;
   rating: number;
+  patients?: number | string;
+  experienceYears?: number;
   image: string;
   category: string;
   bio: string;
