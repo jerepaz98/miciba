@@ -10,7 +10,17 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <Provider store={store}>
         <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="menu"
+            options={{
+              presentation: 'transparentModal',
+              headerShown: false,
+              contentStyle: { backgroundColor: 'transparent' }
+            }}
+          />
+        </Stack>
       </Provider>
     </SafeAreaProvider>
   );

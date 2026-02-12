@@ -4,6 +4,7 @@ import userReducer from './slices/userSlice';
 import doctorsReducer from './slices/doctorsSlice';
 import appointmentsReducer from './slices/appointmentsSlice';
 import uiReducer from './slices/uiSlice';
+import settingsReducer from './slices/settingsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     user: userReducer,
     doctors: doctorsReducer,
     appointments: appointmentsReducer,
-    ui: uiReducer
+    ui: uiReducer,
+    settings: settingsReducer
   }
 });
 

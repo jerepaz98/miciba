@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import NetInfo from '@react-native-community/netinfo';
+import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppButton } from '../../components/ui/AppButton';
 import { AppInput } from '../../components/ui/AppInput';
 import { colors } from '../../constants/colors';
@@ -21,7 +23,7 @@ export const ProfileScreen = () => {
   const storedProfile = useSelector((state: RootState) => state.user.profile);
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ latitude: number | null; longitude: number | null }>({
     latitude: null,
@@ -29,52 +31,80 @@ export const ProfileScreen = () => {
   });
   const [message, setMessage] = useState<string | null>(null);
 
+  const applyProfile = (profile: UserProfile) => {
+    setFullName(profile.fullName ?? '');
+    setPhone(profile.phone ?? '');
+    setAvatarUri(profile.photoUri ?? null);
+    setAddress(profile.address ?? null);
+    setCoords({ latitude: profile.latitude ?? null, longitude: profile.longitude ?? null });
+  };
+
   useEffect(() => {
     const loadProfile = async () => {
       const localProfile = await fetchUserProfileLocal();
-      const profile = localProfile ?? storedProfile;
-      if (profile) {
-        setFullName(profile.fullName);
-        setPhone(profile.phone);
-        setPhotoUri(profile.photoUri ?? null);
-        setAddress(profile.address ?? null);
-        setCoords({ latitude: profile.latitude ?? null, longitude: profile.longitude ?? null });
-        dispatch(setProfile(profile));
+      if (localProfile) {
+        applyProfile(localProfile);
+        return;
+      }
+
+      if (storedProfile) {
+        applyProfile(storedProfile);
       }
     };
 
     loadProfile();
-  }, [dispatch, storedProfile]);
+  }, [storedProfile]);
 
-  const pickFromGallery = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      setMessage(strings.permissions.gallery);
+  const handlePickerResult = (result: ImagePicker.ImagePickerResult) => {
+    if (result.canceled) {
       return;
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.7
-    });
-    if (!result.canceled) {
-      setPhotoUri(result.assets[0].uri);
+
+    if (!result.assets?.length || !result.assets[0]?.uri) {
+      Alert.alert('Error', 'No se pudo obtener la imagen seleccionada.');
+      return;
+    }
+
+    // Preview inmediato del avatar en UI.
+    setAvatarUri(result.assets[0].uri);
+    setMessage(null);
+  };
+
+  const pickFromGallery = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso requerido', strings.permissions.gallery);
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.7
+      });
+      handlePickerResult(result);
+    } catch (error) {
+      Alert.alert('Error', 'No pudimos abrir la galería.');
     }
   };
 
   const takePhoto = async (cameraType: ImagePicker.CameraType) => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      setMessage(strings.permissions.camera);
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      cameraType,
-      allowsEditing: true,
-      quality: 0.7
-    });
-    if (!result.canceled) {
-      setPhotoUri(result.assets[0].uri);
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso requerido', strings.permissions.camera);
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        cameraType,
+        allowsEditing: true,
+        quality: 0.7
+      });
+      handlePickerResult(result);
+    } catch (error) {
+      Alert.alert('Error', 'No pudimos abrir la cámara.');
     }
   };
 
@@ -100,7 +130,7 @@ export const ProfileScreen = () => {
     const profile: UserProfile = {
       fullName,
       phone,
-      photoUri,
+      photoUri: avatarUri,
       latitude: coords.latitude,
       longitude: coords.longitude,
       address
@@ -122,62 +152,75 @@ export const ProfileScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{strings.profile.profile}</Text>
-      <View style={styles.avatarWrapper}>
-        {photoUri ? <Image source={{ uri: photoUri }} style={styles.avatar} /> : <View style={styles.placeholder} />}
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+      <View style={styles.container}>
+        <View style={styles.avatarWrapper}>
+          {avatarUri ? (
+            <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.placeholder}>
+              <Ionicons name="person" size={44} color="#8A9AA7" />
+            </View>
+          )}
+        </View>
+
+        <View style={styles.photoActions}>
+          <AppButton title={strings.profile.chooseFromGallery} onPress={pickFromGallery} style={styles.photoButton} />
+          <AppButton
+            title={strings.profile.frontCamera}
+            onPress={() => takePhoto(ImagePicker.CameraType.front)}
+            style={styles.photoButton}
+          />
+          <AppButton
+            title={strings.profile.backCamera}
+            onPress={() => takePhoto(ImagePicker.CameraType.back)}
+            style={styles.photoButton}
+          />
+        </View>
+
+        <AppInput label={strings.profile.fullName} value={fullName} onChangeText={setFullName} />
+        <AppInput label={strings.profile.phone} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+
+        <View style={styles.locationRow}>
+          <AppButton title={strings.profile.getLocation} onPress={handleLocation} style={styles.locationButton} />
+          <Text style={styles.locationText}>{address ?? strings.profile.noAddress}</Text>
+        </View>
+
+        {message ? <Text style={styles.message}>{message}</Text> : null}
+        <AppButton title={strings.profile.saveProfile} onPress={onSave} />
       </View>
-      <View style={styles.photoActions}>
-        <AppButton title={strings.profile.chooseFromGallery} onPress={pickFromGallery} style={styles.photoButton} />
-        <AppButton
-          title={strings.profile.frontCamera}
-          onPress={() => takePhoto(ImagePicker.CameraType.front)}
-          style={styles.photoButton}
-        />
-        <AppButton
-          title={strings.profile.backCamera}
-          onPress={() => takePhoto(ImagePicker.CameraType.back)}
-          style={styles.photoButton}
-        />
-      </View>
-      <AppInput label={strings.profile.fullName} value={fullName} onChangeText={setFullName} />
-      <AppInput label={strings.profile.phone} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
-      <View style={styles.locationRow}>
-        <AppButton title={strings.profile.getLocation} onPress={handleLocation} style={styles.locationButton} />
-        <Text style={styles.locationText}>{address ?? strings.profile.noAddress}</Text>
-      </View>
-      {message ? <Text style={styles.message}>{message}</Text> : null}
-      <AppButton title={strings.profile.saveProfile} onPress={onSave} />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.bg
+  },
   container: {
     flex: 1,
     padding: theme.spacing.lg,
     backgroundColor: colors.bg
   },
-  title: {
-    fontSize: 22,
-    fontFamily: 'Nunito_700Bold',
-    color: colors.textDark,
-    marginBottom: theme.spacing.md
-  },
   avatarWrapper: {
     alignItems: 'center',
     marginBottom: theme.spacing.md
   },
-  avatar: {
+  avatarImage: {
     width: 120,
     height: 120,
-    borderRadius: 60
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: colors.white
   },
   placeholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: colors.border
+    backgroundColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   photoActions: {
     marginBottom: theme.spacing.md

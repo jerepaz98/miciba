@@ -19,6 +19,9 @@ const appointmentsSlice = createSlice({
     addAppointment: (state, action: PayloadAction<Appointment>) => {
       state.appointments = [action.payload, ...state.appointments];
     },
+    removeAppointment: (state, action: PayloadAction<string>) => {
+      state.appointments = state.appointments.filter((item) => item.id !== action.payload);
+    },
     markAsSynced: (state, action: PayloadAction<{ id: string; firebaseId: string }>) => {
       const target = state.appointments.find((item) => item.id === action.payload.id);
       if (target) {
@@ -30,5 +33,5 @@ const appointmentsSlice = createSlice({
   }
 });
 
-export const { setAppointments, addAppointment, markAsSynced } = appointmentsSlice.actions;
+export const { setAppointments, addAppointment, removeAppointment, markAsSynced } = appointmentsSlice.actions;
 export default appointmentsSlice.reducer;

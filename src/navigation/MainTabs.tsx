@@ -1,11 +1,12 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { DoctorsStack } from './DoctorsStack';
 import { NotificationScreen } from '../screens/notification/NotificationScreen';
-import { MenuStack } from './MenuStack';
+import { PlaceholderScreen } from '../screens/placeholders/PlaceholderScreen';
 import { colors } from '../constants/colors';
 import { strings } from '../constants/strings';
 
@@ -17,6 +18,7 @@ export type MainTabsParamList = {
 };
 
 const Tab = createBottomTabNavigator<MainTabsParamList>();
+const MenuActionScreen = () => <PlaceholderScreen title={strings.menu.menu} />;
 
 const TabIcon = ({
   name,
@@ -74,11 +76,24 @@ export const MainTabs = () => (
     />
     <Tab.Screen
       name="MenuTab"
-      component={MenuStack}
+      component={MenuActionScreen}
+      listeners={{
+        tabPress: (event) => {
+          event.preventDefault();
+        }
+      }}
       options={{
         tabBarLabel: strings.menu.menu,
         title: strings.menu.menu,
-        tabBarIcon: ({ focused }) => <TabIcon name="grid" focused={focused} />
+        tabBarIcon: ({ focused }) => <TabIcon name="grid" focused={focused} />,
+        tabBarButton: (props) => (
+          <Pressable
+            {...props}
+            onPress={() => {
+              router.push('/menu');
+            }}
+          />
+        )
       }}
     />
   </Tab.Navigator>

@@ -2,7 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DoctorsScreen } from '../screens/doctors/DoctorsScreen';
 import { DoctorDetailScreen } from '../screens/doctors/DoctorDetailScreen';
-import { AppointmentFormScreen } from '../screens/doctors/AppointmentFormScreen';
+import { AppointmentBookingScreen } from '../screens/appointments/AppointmentBookingScreen';
 import { strings } from '../constants/strings';
 
 export type DoctorsStackParamList = {
@@ -19,7 +19,7 @@ export const DoctorsStack = () => (
     <Stack.Screen name="DoctorDetail" component={DoctorDetailScreen} options={{ title: strings.doctors.doctorDetail }} />
     <Stack.Screen
       name="AppointmentForm"
-      component={AppointmentFormScreen}
+      component={AppointmentBookingScreen}
       options={{ title: strings.doctors.bookAppointment }}
     />
   </Stack.Navigator>

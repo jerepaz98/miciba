@@ -178,3 +178,7 @@ export const markAppointmentSyncedLocal = async (id: string, firebaseId: string)
     id
   ]);
 };
+
+export const deleteAppointmentLocal = async (id: string) => {
+  await executeSqlAsync('DELETE FROM appointments WHERE id = ?;', [id]);
+};

@@ -12,7 +12,7 @@ type AuthResponse = {
   expiresIn: string;
 };
 
-// ✅ Registro
+
 export const signup = async (email: string, password: string): Promise<AuthResponse> => {
   try {
     const response = await authApi.post(`/accounts:signUp?key=${FIREBASE_API_KEY}`, {
@@ -27,7 +27,7 @@ export const signup = async (email: string, password: string): Promise<AuthRespo
   }
 };
 
-// ✅ Login
+
 export const login = async (email: string, password: string): Promise<AuthResponse> => {
   try {
     const response = await authApi.post(`/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`, {
@@ -42,6 +42,6 @@ export const login = async (email: string, password: string): Promise<AuthRespon
   }
 };
 
-// Alias si ya los usás así en el resto del proyecto
+
 export const signUp = signup;
 export const signIn = login;

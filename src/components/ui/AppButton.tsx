@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
 import { colors } from '../../constants/colors';
 import { theme } from '../../constants/theme';
 
@@ -8,9 +8,10 @@ type Props = {
   onPress: () => void;
   disabled?: boolean;
   style?: ViewStyle;
+  textStyle?: TextStyle;
 };
 
-export const AppButton = ({ title, onPress, disabled, style }: Props) => (
+export const AppButton = ({ title, onPress, disabled, style, textStyle }: Props) => (
   <Pressable
     onPress={onPress}
     disabled={disabled}
@@ -21,7 +22,7 @@ export const AppButton = ({ title, onPress, disabled, style }: Props) => (
       style
     ]}
   >
-    <Text style={styles.text}>{title}</Text>
+    <Text style={[styles.text, textStyle]}>{title}</Text>
   </Pressable>
 );
 

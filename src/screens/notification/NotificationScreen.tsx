@@ -1,95 +1,104 @@
-import React, { useMemo } from 'react';
-import { SectionList, StyleSheet, Text, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { colors } from '../../constants/colors';
+import { theme } from '../../constants/theme';
+import { strings } from '../../constants/strings';
+import { buildAppointmentNotifications, buildBaseNotifications } from '../../data/notifications';
+import { AppNotification, NotificationKind } from '../../types/notification';
+import { getDayBucket, getRelativeTimeLabel } from '../../utils/dateLabels';
+import { AuthenticatedStackParamList } from '../../navigation/AppNavigator';
 
-type NotificationItem = {
-  id: string;
-  title: string;
-  body: string;
-  time: string;
-  iconBg: string;
+const MIS_TURNOS_ROUTE: keyof AuthenticatedStackParamList = 'MyAppointments';
+
+const iconByKind: Record<NotificationKind, { name: keyof typeof Ionicons.glyphMap; bg: string; color: string }> = {
+  appointment_confirmed: { name: 'checkmark-done-circle', bg: '#D8F4E8', color: '#2F9E70' },
+  appointment_reminder: { name: 'alarm-outline', bg: '#DCEBFF', color: '#2C79C9' },
+  appointment_updated: { name: 'refresh-circle-outline', bg: '#E8E4FF', color: '#6B5BD2' },
+  appointment_cancelled: { name: 'close-circle-outline', bg: '#FFE1E1', color: '#D34A4A' }
 };
-
-const todayItems: NotificationItem[] = [
-  {
-    id: 't1',
-    title: 'Remind For Serial',
-    body: 'It is a long established fact that a reader and will be distracted.',
-    time: '11 Min',
-    iconBg: '#7FA7FF'
-  },
-  {
-    id: 't2',
-    title: 'Notification From Dr. Istiak',
-    body: 'It is a long established fact that a reader and will be distracted.',
-    time: '23 Min',
-    iconBg: '#9B8CFF'
-  },
-  {
-    id: 't3',
-    title: 'Notification From Dr. Shofik',
-    body: 'It is a long established fact that a reader and will be distracted.',
-    time: '1 Hours',
-    iconBg: '#FF86B6'
-  }
-];
-
-const yesterdayItems: NotificationItem[] = [
-  {
-    id: 'y1',
-    title: 'Remind For Serial',
-    body: 'It is a long established fact that a reader and will be distracted.',
-    time: '2 Hours',
-    iconBg: '#7FA7FF'
-  },
-  {
-    id: 'y2',
-    title: 'Notification From Dr. Istiak',
-    body: 'It is a long established fact that a reader and will be distracted.',
-    time: '5 Hours',
-    iconBg: '#9B8CFF'
-  }
-];
 
 export const NotificationScreen = () => {
   const insets = useSafeAreaInsets();
-  const sections = useMemo(
-    () => [
-      { title: 'Today', data: todayItems },
-      { title: 'Yesterday', data: yesterdayItems }
-    ],
-    []
-  );
+  const navigation = useNavigation<any>();
+  const appointments = useSelector((state: RootState) => state.appointments.appointments);
+  const [readMap, setReadMap] = useState<Record<string, boolean>>({});
+
+  const sections = useMemo(() => {
+    const now = Date.now();
+    const fromAppointments = buildAppointmentNotifications(appointments, now);
+    const fallback = fromAppointments.length ? [] : buildBaseNotifications(now);
+    const merged = [...fromAppointments, ...fallback]
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .map((item) => ({
+        ...item,
+        timeLabel: getRelativeTimeLabel(item.createdAt, now),
+        isRead: readMap[item.id] ?? item.isRead ?? false
+      }));
+
+    const grouped: Record<'Hoy' | 'Ayer' | 'Anteriores', AppNotification[]> = {
+      Hoy: [],
+      Ayer: [],
+      Anteriores: []
+    };
+
+    merged.forEach((item) => {
+      grouped[getDayBucket(item.createdAt)].push(item);
+    });
+
+    return (Object.keys(grouped) as Array<keyof typeof grouped>)
+      .filter((bucket) => grouped[bucket].length > 0)
+      .map((bucket) => ({ title: bucket, data: grouped[bucket] }));
+  }, [appointments, readMap]);
+
+  const openMyAppointments = (item: AppNotification) => {
+    setReadMap((prev) => ({ ...prev, [item.id]: true }));
+
+    const parentNavigator = navigation.getParent?.();
+    if (parentNavigator) {
+      parentNavigator.navigate(MIS_TURNOS_ROUTE);
+      return;
+    }
+
+    navigation.navigate(MIS_TURNOS_ROUTE);
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Text style={styles.headerTitle}>Notifications</Text>
-        <Ionicons name="chatbubble-ellipses-outline" size={20} color="#1E2430" style={styles.headerIcon} />
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
+        <Text style={styles.headerTitle}>{strings.notifications.notifications}</Text>
       </View>
-      <View style={styles.headerSpacer} />
+
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
         renderSectionHeader={({ section }) => <Text style={styles.sectionTitle}>{section.title}</Text>}
-        renderItem={({ item, index, section }) => (
-          <View>
-            <View style={styles.row}>
-              <View style={[styles.iconBox, { backgroundColor: item.iconBg }]}>
-                <Ionicons name="notifications" size={18} color="#FFFFFF" />
+        renderItem={({ item }) => {
+          const iconConfig = iconByKind[item.kind];
+          return (
+            <Pressable style={[styles.row, item.isRead ? styles.readRow : null]} onPress={() => openMyAppointments(item)}>
+              <View style={[styles.iconBox, { backgroundColor: iconConfig.bg }]}>
+                <Ionicons name={iconConfig.name} size={20} color={iconConfig.color} />
               </View>
+
               <View style={styles.textWrap}>
                 <Text style={styles.itemTitle}>{item.title}</Text>
-                <Text style={styles.itemBody}>{item.body}</Text>
+                <Text style={styles.itemBody} numberOfLines={2}>
+                  {item.message}
+                </Text>
               </View>
-              <Text style={styles.time}>{item.time}</Text>
-            </View>
-            {index < section.data.length - 1 ? <View style={styles.divider} /> : null}
-          </View>
-        )}
+
+              <Text style={styles.time}>{item.timeLabel}</Text>
+            </Pressable>
+          );
+        }}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
   );
@@ -98,82 +107,69 @@ export const NotificationScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#EEF3FF'
+    backgroundColor: '#EEF4FA'
   },
   header: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingBottom: 14,
-    alignItems: 'center',
-    justifyContent: 'center'
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: 12
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1E2430'
-  },
-  headerIcon: {
-    position: 'absolute',
-    right: 20,
-    bottom: 14
-  },
-  headerSpacer: {
-    height: 12,
-    backgroundColor: '#EEF3FF'
+    fontSize: 26,
+    color: colors.textDark,
+    fontFamily: 'Nunito_700Bold'
   },
   list: {
-    paddingHorizontal: 20,
-    paddingBottom: 32
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: 110
   },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1E2430',
-    marginTop: 8,
-    marginBottom: 10
+    color: colors.textDark,
+    fontFamily: 'Nunito_700Bold',
+    marginBottom: 10,
+    marginTop: 6
   },
   row: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
+    backgroundColor: colors.white,
+    borderRadius: 18,
+    paddingHorizontal: 14,
     paddingVertical: 14,
-    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2
+    ...theme.shadow.light
+  },
+  readRow: {
+    opacity: 0.72
   },
   iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12
   },
   textWrap: {
-    flex: 1
+    flex: 1,
+    paddingRight: 10
   },
   itemTitle: {
     fontSize: 15,
-    fontWeight: '700',
-    color: '#1E2430'
+    color: colors.textDark,
+    fontFamily: 'Nunito_700Bold'
   },
   itemBody: {
-    marginTop: 4,
-    fontSize: 12,
-    color: '#8A90A6'
+    marginTop: 3,
+    color: colors.textSoft,
+    fontFamily: 'Nunito_400Regular',
+    fontSize: 12
   },
   time: {
-    fontSize: 11,
-    color: '#9AA2B5',
-    marginLeft: 10
+    color: colors.textSoft,
+    fontFamily: 'Nunito_600SemiBold',
+    fontSize: 11
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#E9EDF7',
-    marginHorizontal: 16
+  separator: {
+    height: 10
   }
 });
